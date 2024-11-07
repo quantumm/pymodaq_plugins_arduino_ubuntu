@@ -8,10 +8,16 @@ from pymodaq.utils.parameter import Parameter
 
 from pyfirmata2 import Arduino
 
+PORT = Arduino.AUTODETECT
+## If AUTODETECT fails, enter the port name manually
+## PORT = /ttyACM0
+## You may have to change the access rights to the file that represents the port:
+## sudo chmod a+rw /dev/ttyACM0
+
 
 class DAQ_0DViewer_ArduinoUbuntu(DAQ_Viewer_base):
     """ Instrument plugin class for a OD viewer.
-    
+
     This object inherits all functionalities to communicate with PyMoDAQ’s DAQ_Viewer module through inheritance via
     DAQ_Viewer_base. It makes a bridge between the DAQ_Viewer module and the Python wrapper of a particular instrument.
 
@@ -69,21 +75,16 @@ class DAQ_0DViewer_ArduinoUbuntu(DAQ_Viewer_base):
         if self.is_master:
             self.controller = Arduino
 
-            PORT = Arduino.AUTODETECT
-            ## If AUTODETECT fails, enter the port name manually
-            ## PORT = /ttyACM0
-
         # TODO for your custom plugin (optional) initialize viewers panel with the future type of data
-        self.dte_signal_temp.emit(DataToExport(name='arduino_ubuntu',
-                                               data=[DataFromPlugins(name='Mock1',
-                                                                    data=[np.array([0]), np.array([0])],
-                                                                    dim='Data0D',
-                                                                    labels=['Mock1', 'label2'])]))
+        # self.dte_signal_temp.emit(DataToExport(name='arduino_ubuntu',
+        #                                        data=[DataFromPlugins(name='Mock1',
+        #                                                             data=[np.array([0]), np.array([0])],
+        #                                                             dim='Data0D',
+        #                                                             labels=['Mock1', 'label2'])]))
 
         info = "Board initialized!"
 
-        if PORT:
-            initialized = True
+        initialized = True
         return info, initialized
 
     def close(self):
