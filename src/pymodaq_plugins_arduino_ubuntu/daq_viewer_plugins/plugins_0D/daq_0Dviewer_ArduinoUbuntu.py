@@ -13,6 +13,8 @@ PORT = Arduino.AUTODETECT
 ## PORT = /ttyACM0
 ## You may have to change the access rights to the file that represents the port:
 ## sudo chmod a+rw /dev/ttyACM0
+## This file seems to be created at every startup of the operating system. It could then be necessary to redo this
+## operation each time one unplug/plug the board, or restart the computer.
 
 
 class DAQ_0DViewer_ArduinoUbuntu(DAQ_Viewer_base):
@@ -22,6 +24,7 @@ class DAQ_0DViewer_ArduinoUbuntu(DAQ_Viewer_base):
     DAQ_Viewer_base. It makes a bridge between the DAQ_Viewer module and the Python wrapper of a particular instrument.
 
     This plugin is made to read an analog output of an Arduino board with PyMoDAQ.
+
     Tested with an Arduino Uno, Arduino IDE 2.2.3
     Firmata Standard server
     Pyfirmata2 2.5.0
@@ -34,9 +37,9 @@ class DAQ_0DViewer_ArduinoUbuntu(DAQ_Viewer_base):
 
     Attributes:
     -----------
-    controller: object
+    controller: pyfirmata2.Arduino object
         The particular object that allow the communication with the hardware, in general a python wrapper around the
-         hardware library.
+        hardware library.
     """
     params = comon_parameters+[
         ]
@@ -59,7 +62,7 @@ class DAQ_0DViewer_ArduinoUbuntu(DAQ_Viewer_base):
 
         Parameters
         ----------
-        controller: (object)
+        controller: pyfirmata2.Arduino object
             custom object of a PyMoDAQ plugin (Slave case). None if only one actuator/detector by controller
             (Master case)
 
@@ -73,7 +76,7 @@ class DAQ_0DViewer_ArduinoUbuntu(DAQ_Viewer_base):
         self.ini_detector_init(slave_controller=controller)
 
         if self.is_master:
-            self.controller = Arduino
+            self.controller = Arduino(PORT)
 
         # TODO for your custom plugin (optional) initialize viewers panel with the future type of data
         # self.dte_signal_temp.emit(DataToExport(name='arduino_ubuntu',
