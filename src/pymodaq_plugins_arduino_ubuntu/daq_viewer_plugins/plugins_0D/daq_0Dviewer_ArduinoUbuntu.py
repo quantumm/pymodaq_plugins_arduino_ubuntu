@@ -48,6 +48,9 @@ class DAQ_0DViewer_ArduinoUbuntu(DAQ_Viewer_base):
 
         self.controller: Arduino = None
 
+        self.samplingRate = 5  # sampling rate in Hz
+        self.timestamp = 0
+
     def commit_settings(self, param: Parameter):
         """Apply the consequences of a change of value in the detector settings
 
@@ -110,23 +113,23 @@ class DAQ_0DViewer_ArduinoUbuntu(DAQ_Viewer_base):
         ## TODO for your custom plugin: you should choose EITHER the synchrone or the asynchrone version following
 
         # synchrone version (blocking function)
-        raise NotImplemented  # when writing your own plugin remove this line
-        data_tot = self.controller.your_method_to_start_a_grab_snap()
-        self.dte_signal.emit(DataToExport(name='myplugin',
-                                          data=[DataFromPlugins(name='Mock1', data=data_tot,
-                                                                dim='Data0D', labels=['dat0', 'data1'])]))
+        # raise NotImplemented  # when writing your own plugin remove this line
+        # data_tot = self.controller.your_method_to_start_a_grab_snap()
+        # self.dte_signal.emit(DataToExport(name='myplugin',
+        #                                   data=[DataFromPlugins(name='Mock1', data=data_tot,
+        #                                                         dim='Data0D', labels=['dat0', 'data1'])]))
         #########################################################
 
         # asynchrone version (non-blocking function with callback)
-        raise NotImplemented  # when writing your own plugin remove this line
-        self.controller.your_method_to_start_a_grab_snap(self.callback)  # when writing your own plugin replace this line
-        #########################################################
+        self.controller.analog[1].register_callback(self.callback)
+        self.controller.samplingOn(1000 / self.samplingRate)
+        self.controller.analog[1].enable_reporting()
 
-
-    def callback(self):
-        """optional asynchrone method called when the detector has finished its acquisition of data"""
-        data_tot = self.controller.your_method_to_get_data_from_buffer()
-        self.dte_signal.emit(DataToExport(name='myplugin',
+    def callback(self, data):
+        temperature = (data*5000 - 500)/10
+        data_tot = temperature
+        self.timestamp += (1 / self.samplingRate)
+        self.dte_signal.emit(DataToExport(name='arduino_ubuntu_plugin',
                                           data=[DataFromPlugins(name='Mock1', data=data_tot,
                                                                 dim='Data0D', labels=['dat0', 'data1'])]))
 
