@@ -38,8 +38,7 @@ class DAQ_0DViewer_ArduinoUbuntu(DAQ_Viewer_base):
     Attributes:
     -----------
     controller: pyfirmata2.Arduino object
-        The particular object that allow the communication with the hardware, in general a python wrapper around the
-        hardware library.
+        Object that allow the communication with the board.
     """
     params = comon_parameters+[
         ]
@@ -81,13 +80,6 @@ class DAQ_0DViewer_ArduinoUbuntu(DAQ_Viewer_base):
         if self.is_master:
             self.controller = Arduino(PORT)
 
-        # TODO for your custom plugin (optional) initialize viewers panel with the future type of data
-        # self.dte_signal_temp.emit(DataToExport(name='arduino_ubuntu',
-        #                                        data=[DataFromPlugins(name='Mock1',
-        #                                                             data=[np.array([0]), np.array([0])],
-        #                                                             dim='Data0D',
-        #                                                             labels=['Mock1', 'label2'])]))
-
         info = "Board initialized!"
 
         initialized = True
@@ -100,30 +92,9 @@ class DAQ_0DViewer_ArduinoUbuntu(DAQ_Viewer_base):
         #  self.controller.your_method_to_terminate_the_communication()  # when writing your own plugin replace this line
 
     def grab_data(self, Naverage=1, **kwargs):
-        """Start a grab from the detector
-
-        Parameters
-        ----------
-        Naverage: int
-            Number of hardware averaging (if hardware averaging is possible, self.hardware_averaging should be set to
-            True in class preamble and you should code this implementation)
-        kwargs: dict
-            others optionals arguments
-        """
-        ## TODO for your custom plugin: you should choose EITHER the synchrone or the asynchrone version following
-
-        # synchrone version (blocking function)
-        # raise NotImplemented  # when writing your own plugin remove this line
-        # data_tot = self.controller.your_method_to_start_a_grab_snap()
-        # self.dte_signal.emit(DataToExport(name='myplugin',
-        #                                   data=[DataFromPlugins(name='Mock1', data=data_tot,
-        #                                                         dim='Data0D', labels=['dat0', 'data1'])]))
-        #########################################################
-
-        # asynchrone version (non-blocking function with callback)
-        self.controller.analog[1].register_callback(self.callback)
+        self.controller.analog[0].register_callback(self.callback)
         self.controller.samplingOn(1000 / self.samplingRate)
-        self.controller.analog[1].enable_reporting()
+        self.controller.analog[0].enable_reporting()
 
     def callback(self, data):
         temperature = (data*5000 - 500)/10
